@@ -1,0 +1,37 @@
+---
+- name: Web Server Setup
+  hosts: webservers  # group name from your inventory.ini
+  become: yes  # Use sudo for tasks that require root privileges
+  tasks:
+    - name: Ensure Apache is installed
+      package:
+        name: apache2
+        state: present
+
+    - name: Start and enable Apache service
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Create an index.html file
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <html>
+            <head><title>Welcome to Web Server</title></head>
+            <body>
+              <h1>Hello, this is a simple web server!</h1>
+            </body>
+          </html>
+
+    - name: Ensure Apache is running
+      service:
+        name: apache2
+        state: started
+
+    - name: Open firewall for HTTP and HTTPS
+      ufw:
+        rule: allow
+        name: 'Apache Full'
+
