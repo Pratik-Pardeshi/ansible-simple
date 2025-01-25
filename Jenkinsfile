@@ -1,13 +1,13 @@
 pipeline {
     agent any
     environment {
-        GIT_REPO = 'https://github.com/Pratik-Pardeshi/new-ansible.git'
-        GIT_BRANCH = 'main'  // Update this if your branch name is different
+        GIT_REPO = 'https://github.com/Pratik-Pardeshi/new-ansible.git'  // Your Git repository
+        GIT_BRANCH = 'main'  // Adjust this if you're using a different branch
     }
     stages {
         stage('Checkout SCM') {
             steps {
-                // Checkout the code from GitHub repository
+                // Checkout the Git repository
                 checkout scm: [
                     $class: 'GitSCM',
                     branches: [[name: "*/${GIT_BRANCH}"]],
@@ -15,23 +15,33 @@ pipeline {
                 ]
             }
         }
-        
-        
 
+        // Optional: Install dependencies if needed (skip if not applicable)
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    echo 'Skipping dependency installation (requirements.txt not found or not needed).'
+                }
+            }
+        }
+
+        // Run the Ansible Playbook
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    // Running your Ansible playbook
-                    // Replace this with your actual playbook run command
+                    // Running the Ansible playbook
+                    echo 'Running the Ansible Playbook...'
                     sh 'ansible-playbook -i inventory.ini playbook.yml'
                 }
             }
         }
 
+        // Example Webserver test (replace with your actual test)
         stage('Test Webserver') {
             steps {
                 script {
-                    // Example test: Replace with your actual test
+                    // Example test: Replace with your actual test command
+                    echo 'Testing the Webserver setup...'
                     sh 'curl -f http://localhost'
                 }
             }
@@ -39,7 +49,6 @@ pipeline {
     }
     post {
         always {
-            // Clean up or other final steps if needed
             echo 'Pipeline execution completed.'
         }
         success {
