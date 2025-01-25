@@ -7,7 +7,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the repository containing your Ansible playbook
-                git 'https://your-repository-url.git'
+                git 'https://github.com/Pratik-Pardeshi/new-ansible.git'
             }
         }
 
