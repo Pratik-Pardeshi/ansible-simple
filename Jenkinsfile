@@ -16,15 +16,7 @@ pipeline {
             }
         }
         
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    // Example to install dependencies
-                    // Replace with your actual commands
-                    sh 'pip install -r requirements.txt' 
-                }
-            }
-        }
+        
 
         stage('Run Ansible Playbook') {
             steps {
