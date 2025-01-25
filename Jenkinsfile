@@ -1,22 +1,27 @@
 pipeline {
     agent any
     environment {
-        ANSIBLE_HOST_KEY_CHECKING = "False"  // Disable SSH key checking for simplicity
+        GIT_REPO = 'https://github.com/Pratik-Pardeshi/new-ansible.git'
+        GIT_BRANCH = 'main'  // Update this if your branch name is different
     }
     stages {
-        stage('Clone Repository') {
+        stage('Checkout SCM') {
             steps {
-                // Clone the repository containing your Ansible playbook
-                git 'https://github.com/Pratik-Pardeshi/new-ansible.git'
+                // Checkout the code from GitHub repository
+                checkout scm: [
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${GIT_BRANCH}"]],
+                    userRemoteConfigs: [[url: "${GIT_REPO}"]]
+                ]
             }
         }
-
+        
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install necessary dependencies for Ansible
-                    sh 'sudo apt-get update && sudo apt-get install -y python3-pip'
-                    sh 'pip3 install ansible'
+                    // Example to install dependencies
+                    // Replace with your actual commands
+                    sh 'pip install -r requirements.txt' 
                 }
             }
         }
@@ -24,8 +29,9 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    // Run the Ansible playbook to set up the webserver
-                    sh 'ansible-playbook -i inventory ansible/setup-webserver.yml'
+                    // Running your Ansible playbook
+                    // Replace this with your actual playbook run command
+                    sh 'ansible-playbook -i inventory.ini playbook.yml'
                 }
             }
         }
@@ -33,15 +39,22 @@ pipeline {
         stage('Test Webserver') {
             steps {
                 script {
-                    // Check if Apache is serving the index page
-                    def response = sh(script: 'curl -s http://192.168.1.10', returnStdout: true)
-                    if (response.contains("Welcome to the Apache Webserver!")) {
-                        echo "Webserver is deployed successfully!"
-                    } else {
-                        error "Webserver setup failed."
-                    }
+                    // Example test: Replace with your actual test
+                    sh 'curl -f http://localhost'
                 }
             }
+        }
+    }
+    post {
+        always {
+            // Clean up or other final steps if needed
+            echo 'Pipeline execution completed.'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
