@@ -1,0 +1,53 @@
+---
+- name: Setup Apache Webserver on Linux
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Install Apache (Ubuntu/Debian)
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Apache (CentOS/RHEL)
+      yum:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Start Apache service (CentOS/RHEL)
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure Apache is running
+      systemd:
+        name: apache2
+        state: started
+        enabled: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure Apache is running (CentOS/RHEL)
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Copy custom index.html
+      copy:
+        content: "<html><body><h1>Welcome to the Apache Webserver!</h1></body></html>"
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
