@@ -3,14 +3,16 @@ pipeline {
 
     environment {
         ANSIBLE_PLAYBOOK = '/home/jenkins/deploy.yml' // Path to deploy.yml
-        INVENTORY_FILE = '/home/jenkins/inventory.ini' // Path to inventory file
+        TARGET_HOST = '172.31.24.125' // Replace with the IP of your web server
+        SSH_USER = 'ansible' // Replace with the SSH username for your web server
+        SSH_KEY = '/home/jenkins/.ssh/id_rsa' // Path to the private SSH key
     }
 
     stages {
         stage('Preparation') {
             steps {
                 echo 'Preparing workspace...'
-                
+
                 // Ensure required files exist
                 sh '''
                 if [ ! -f "$ANSIBLE_PLAYBOOK" ]; then
@@ -18,8 +20,8 @@ pipeline {
                     exit 1
                 fi
 
-                if [ ! -f "$INVENTORY_FILE" ]; then
-                    echo "Error: Inventory file $INVENTORY_FILE not found!"
+                if [ ! -f "$SSH_KEY" ]; then
+                    echo "Error: SSH private key $SSH_KEY not found!"
                     exit 1
                 fi
                 '''
@@ -30,9 +32,9 @@ pipeline {
             steps {
                 echo 'Running Ansible playbook...'
 
-                // Execute Ansible playbook
+                // Execute Ansible playbook without inventory.ini
                 sh '''
-                ansible-playbook -i $INVENTORY_FILE $ANSIBLE_PLAYBOOK
+                ansible-playbook -i "$TARGET_HOST," -u "$SSH_USER" --private-key "$SSH_KEY" "$ANSIBLE_PLAYBOOK"
                 '''
             }
         }
