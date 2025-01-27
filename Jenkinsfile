@@ -10,7 +10,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning application repository...'
-                git branch: 'main', url: 'https://github.com/your-repo/sample-app.git'
+                git branch: 'main', url: 'https://github.com/Pratik-Pardeshi/new-ansible.git'
                 sh 'cp -r * /home/jenkins/app/' // Copy repo files to app folder
             }
         }
