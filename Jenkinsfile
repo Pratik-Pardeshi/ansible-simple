@@ -2,34 +2,26 @@ pipeline {
     agent any
 
     environment {
-        SSH_KEY_PATH = '/var/lib/jenkins/.ssh/id_rsa'
+        ANSIBLE_PLAYBOOK = '/home/jenkins/deploy.yml' // Path to deploy.yml
+        INVENTORY_FILE = '/home/jenkins/inventory.ini' // Path to inventory file
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Preparation') {
             steps {
-                echo 'Cloning application repository...'
-                git branch: 'main', url: 'https://github.com/Pratik-Pardeshi/new-ansible.git'
-            }
-        }
-
-        stage('Set up SSH Access') {
-            steps {
-                echo 'Setting up SSH access...'
-
-                // Ensure the SSH key exists
+                echo 'Preparing workspace...'
+                
+                // Ensure required files exist
                 sh '''
-                if [ ! -f $SSH_KEY_PATH ]; then
-                    echo "SSH private key not found. Please configure the SSH key manually."
+                if [ ! -f "$ANSIBLE_PLAYBOOK" ]; then
+                    echo "Error: Ansible playbook $ANSIBLE_PLAYBOOK not found!"
                     exit 1
                 fi
-                '''
 
-                // Add SSH key to the SSH agent
-                sh '''
-                eval $(ssh-agent)
-                ssh-add $SSH_KEY_PATH
-                ssh-keyscan -H 172.31.24.125 >> ~/.ssh/known_hosts
+                if [ ! -f "$INVENTORY_FILE" ]; then
+                    echo "Error: Inventory file $INVENTORY_FILE not found!"
+                    exit 1
+                fi
                 '''
             }
         }
@@ -37,10 +29,21 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 echo 'Running Ansible playbook...'
+
+                // Execute Ansible playbook
                 sh '''
-                ansible-playbook -i /home/jenkins/inventory.ini /home/jenkins/deploy.yml
+                ansible-playbook -i $INVENTORY_FILE $ANSIBLE_PLAYBOOK
                 '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Ansible playbook executed successfully!'
+        }
+        failure {
+            echo 'Ansible playbook execution failed.'
         }
     }
 }
