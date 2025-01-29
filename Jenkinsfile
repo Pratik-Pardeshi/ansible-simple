@@ -2,21 +2,10 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
+        stage('Trigger Ansible') {
             steps {
-                git branch: 'main', url: 'https://github.com/Pratik-Pardeshi/ansible-simple.git'
-            }
-        }
-
-        stage('Run Ansible Playbook') {
-            steps {
-                sh 'ansible-playbook playbook.yml'
-            }
-        }
-
-        stage('Deploy to Web Server') {
-            steps {
-                sh 'cp index.html /var/www/html/index.html'
+                // SSH into the Ansible server and run the playbook
+                sh 'ssh -i ~/.ssh/id_rsa ec2-user@172.31.14.31 "ansible-playbook /home/ec2-user/ansible-project/playbook.yml"'
             }
         }
     }
