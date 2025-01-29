@@ -2,40 +2,28 @@ pipeline {
     agent any
 
     environment {
-        ANSIBLE_SERVER = 'ansible@172.31.14.31'
-        GIT_REPO = 'https://github.com/pratik-pardeshi/new-ansible.git'
-        DEPLOY_YML = 'deploy.yml'
-        TARGET_DIR = '/home/jenkins/ansible-project/'
+        ANSIBLE_SERVER = 'ansible@172.31.14.31' // Ansible server address
+        PLAYBOOK_PATH = '/home/ansible/playbook.yml' // Path to playbook on Ansible server
+        SSH_KEY_PATH = '/var/lib/jenkins/.ssh/id_rsa' // Path to private SSH key for Jenkins
     }
 
     stages {
-        stage('Clone Git Repository') {
+        stage('SSH to Ansible Server and Run Playbook') {
             steps {
-                // Clone the repository containing deploy.yml
-                git branch: 'main', url: "${GIT_REPO}"
+                script {
+                    // Run SSH command to execute Ansible playbook
+                    sh """
+                    ssh -i ${SSH_KEY_PATH} ansible@${ANSIBLE_SERVER} 'ansible-playbook ${PLAYBOOK_PATH}'
+                    """
+                }
             }
         }
+    }
 
-        stage('List Workspace') {
-            steps {
-                // List the current workspace to confirm the file's location
-                sh 'pwd'
-                sh 'ls -alh'
-            }
-        }
-
-        stage('Copy deploy.yml to Ansible Server') {
-            steps {
-                // Copy deploy.yml to /home/jenkins/ansible-project/ on the Ansible server
-                sh 'scp -i /var/lib/jenkins/.ssh/id_rsa ${DEPLOY_YML} ${ANSIBLE_SERVER}:${TARGET_DIR}'
-            }
-        }
-
-        stage('Run Ansible Playbook') {
-            steps {
-                // SSH into the Ansible server and run the playbook
-                sh 'ssh -i /var/lib/jenkins/.ssh/id_rsa ${ANSIBLE_SERVER} "ansible-playbook ${TARGET_DIR}${DEPLOY_YML}"'
-            }
+    post {
+        always {
+            // Clean up any resources or notifications
+            echo "Playbook execution completed"
         }
     }
 }
