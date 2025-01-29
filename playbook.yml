@@ -1,18 +1,6 @@
 ---
-- name: Web Server Setup
-  hosts: web    # Change this from 'webservers' to 'web'
-  become: yes   # If you're running with elevated privileges
-
-  tasks:
-    - name: Install Apache
-      apt:
-        name: apache2
-        state: present
-      when: ansible_os_family == "Debian"  # Example condition, adjust as needed
-
-    - name: Ensure Apache is running
-      service:
-        name: apache2
-        state: started
-        enabled: yes
-      when: ansible_os_family == "Debian"  # Example condition, adjust as needed
+- name: Deploy index.html using Jenkins
+  hosts: webserver
+  become: yes
+  roles:
+    - deploy
