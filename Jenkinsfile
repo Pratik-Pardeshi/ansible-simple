@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         ANSIBLE_SERVER = 'ansible@172.31.14.31'
-        GIT_REPO = 'https://github.com/pratik-pardeshi/ansible-simple'
+        GIT_REPO = 'https://github.com/pratik-pardeshi/ansible-simple.git'
         DEPLOY_YML = 'deploy.yml'
         TARGET_DIR = '/home/jenkins/ansible-project/' // Updated directory
     }
