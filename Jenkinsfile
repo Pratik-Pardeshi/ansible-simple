@@ -9,10 +9,12 @@ pipeline {
         }
 
         stage('Copy Files to Ansible Server') {
-            steps {
-                sh 'scp -i /var/lib/jenkins/.ssh/id_rsa -r * ansible@172.31.14.31:/home/ec2-user/ansible-project/'
-            }
-        }
+    steps {
+        sh 'ssh -i /var/lib/jenkins/.ssh/id_rsa ansible@172.31.14.31 "sudo mkdir -p /home/ec2-user/ansible-project"'
+        sh 'scp -i /var/lib/jenkins/.ssh/id_rsa -r Jenkinsfile ansible inventory.ini playbook.yml roles ansible@172.31.14.31:/home/ec2-user/ansible-project/'
+    }
+}
+
 
         stage('Run Ansible Playbook') {
             steps {
