@@ -8,10 +8,32 @@ pipeline {
     }
 
     stages {
-        stage('SSH to Ansible Server and Run Playbook') {
+        stage('Create Playbook and Run') {
             steps {
                 script {
-                    // Run SSH command to execute Ansible playbook
+                    // Step 1: SSH into Ansible server and create playbook.yml
+                    sh """
+                    ssh -i ${SSH_KEY_PATH} ansible@${ANSIBLE_SERVER} << 'EOF'
+                    # Create playbook.yml on Ansible server
+                    cat <<EOL > ${PLAYBOOK_PATH}
+                    ---
+                    - name: Deploy Example Application
+                      hosts: localhost
+                      tasks:
+                        - name: Ensure Apache is installed
+                          ansible.builtin.yum:
+                            name: httpd
+                            state: present
+                        - name: Start Apache service
+                          ansible.builtin.service:
+                            name: httpd
+                            state: started
+                            enabled: yes
+                    EOL
+                    EOF
+                    """
+
+                    // Step 2: Run the playbook
                     sh """
                     ssh -i ${SSH_KEY_PATH} ansible@${ANSIBLE_SERVER} 'ansible-playbook ${PLAYBOOK_PATH}'
                     """
@@ -22,7 +44,6 @@ pipeline {
 
     post {
         always {
-            // Clean up any resources or notifications
             echo "Playbook execution completed"
         }
     }
