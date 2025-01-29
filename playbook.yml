@@ -1,15 +1,41 @@
 ---
-- name: Deploy index.html to Web Server
-  hosts: webserver
-  become: yes
-  tasks:
-    - name: Clone Repository
-      git:
-        repo: "https://github.com/Pratik-Pardeshi/ansible-simple.git"
-        dest: /tmp/website
-        version: main
+- name: Deploy Web Application
+  hosts: webserver  # Ensure your web server is defined in Ansible hosts
+  become: yes       # Run as root
 
-    - name: Copy index.html to Web Server
+  tasks:
+    - name: Ensure Apache is installed
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable Apache service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Create web root directory
+      file:
+        path: /var/www/html
+        state: directory
+        owner: apache
+        group: apache
+        mode: '0755'
+
+    - name: Copy index.html from Ansible server to Web server
       copy:
-        src: /tmp/website/index.html
-        dest: /var/www/html/index.html
+        src: /home/ansible/index.html  # Path on Ansible server
+        dest: /var/www/html/index.html  # Path on Web server
+        owner: apache
+        group: apache
+        mode: '0644'
+
+    - name: Set correct SELinux permissions (if enabled)
+      command: restorecon -Rv /var/www/html
+      when: ansible_selinux.status == "enabled"
+
+    - name: Restart Apache to apply changes
+      service:
+        name: httpd
+        state: restarted
