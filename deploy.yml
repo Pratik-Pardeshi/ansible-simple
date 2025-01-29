@@ -1,0 +1,15 @@
+---
+- name: Deploy index.html to Web Server
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: Clone Repository
+      git:
+        repo: "https://github.com/Pratik-Pardeshi/ansible-simple.git"
+        dest: /tmp/website
+        version: main
+
+    - name: Copy index.html to Web Server
+      copy:
+        src: /tmp/website/index.html
+        dest: /var/www/html/index.html
