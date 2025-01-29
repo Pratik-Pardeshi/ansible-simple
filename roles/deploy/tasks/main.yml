@@ -1,0 +1,11 @@
+---
+- name: Clone repository with index.html
+  git:
+    repo: "https://github.com/your-repo/static-website.git"
+    dest: /tmp/website
+    version: main
+
+- name: Copy index.html to Jenkins workspace
+  copy:
+    src: /tmp/website/index.html
+    dest: /var/lib/jenkins/workspace/index.html
