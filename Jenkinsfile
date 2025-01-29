@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        ANSIBLE_SERVER = 'ssh 172.31.14.31'
+        ANSIBLE_SERVER = '172.31.14.31'
         GIT_REPO = 'https://github.com/pratik-pardeshi/ansible-simple.git'
         DEPLOY_YML = 'deploy.yml'
         INDEX_HTML = 'index.html'
