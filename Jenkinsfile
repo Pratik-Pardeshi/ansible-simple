@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        ANSIBLE_SERVER = '172.31.34.55' // Ansible server address
+        ANSIBLE_SERVER = '172.31.34.144' // Ansible server address
         PLAYBOOK_PATH = '/home/ansible/playbook.yml' // Path to playbook on Ansible server
         SSH_KEY_PATH = '/var/lib/jenkins/.ssh/id_rsa' // Path to private SSH key for Jenkins
     }
