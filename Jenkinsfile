@@ -13,23 +13,7 @@ pipeline {
                 script {
                     // Step 1: SSH into Ansible server and create playbook.yml
                     sh """
-                    ssh -i ${SSH_KEY_PATH} ansible@${ANSIBLE_SERVER} <<'EOF'
-                    cat > ${PLAYBOOK_PATH} << EOL
-                    ---
-                    - name: Deploy Example Application
-                      hosts: localhost
-                      tasks:
-                        - name: Ensure Apache is installed
-                          ansible.builtin.yum:
-                            name: httpd
-                            state: present
-                        - name: Start Apache service
-                          ansible.builtin.service:
-                            name: httpd
-                            state: started
-                            enabled: yes
-                    EOL
-                    EOF
+                    ssh -i ${SSH_KEY_PATH} ansible@${ANSIBLE_SERVER} 'echo "---" > ${PLAYBOOK_PATH} && echo "- name: Deploy Example Application" >> ${PLAYBOOK_PATH} && echo "  hosts: localhost" >> ${PLAYBOOK_PATH} && echo "  tasks:" >> ${PLAYBOOK_PATH} && echo "    - name: Ensure Apache is installed" >> ${PLAYBOOK_PATH} && echo "      ansible.builtin.yum:" >> ${PLAYBOOK_PATH} && echo "        name: httpd" >> ${PLAYBOOK_PATH} && echo "        state: present" >> ${PLAYBOOK_PATH} && echo "    - name: Start Apache service" >> ${PLAYBOOK_PATH} && echo "      ansible.builtin.service:" >> ${PLAYBOOK_PATH} && echo "        name: httpd" >> ${PLAYBOOK_PATH} && echo "        state: started" >> ${PLAYBOOK_PATH} && echo "        enabled: yes" >> ${PLAYBOOK_PATH}'
                     """
 
                     // Step 2: Run the playbook
