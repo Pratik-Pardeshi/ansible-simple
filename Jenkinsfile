@@ -2,9 +2,15 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Ansible Playbook') {
+        stage('Clone Repository') {
             steps {
-                sh 'ssh -i /var/lib/jenkins/.ssh/id_rsa ansible@172.31.14.31 "rm -rf /home/ec2-user/ansible-project && git clone https://github.com/pratik-pardeshi/ansible-simple.git /home/ec2-user/ansible-project"'
+                git branch: 'main', url: 'https://github.com/pratik-pardeshi/ansible-simple.git'
+            }
+        }
+
+        stage('Copy Files to Ansible Server') {
+            steps {
+                sh 'scp -i /var/lib/jenkins/.ssh/id_rsa -r * ansible@172.31.14.31:/home/ec2-user/ansible-project/'
             }
         }
 
