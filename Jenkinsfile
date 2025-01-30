@@ -5,7 +5,7 @@ pipeline {
         stage('Pull Files from Git') {
             steps {
                 script {
-                    sh 'git clone https://your-git-repo-url.git /tmp/deployment'
+                    sh 'git clone https://github.com/Pratik-Pardeshi/ansible-simple.git /tmp/deployment'
                 }
             }
         }
