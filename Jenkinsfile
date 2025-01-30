@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ansible@172.31.34.55 'mkdir -p /home/ansible/deployment && chmod -R 777 /home/ansible/deployment'
+                    ssh -o StrictHostKeyChecking=no ssh 172.31.34.55 'mkdir -p /home/ansible/deployment && chmod -R 777 /home/ansible/deployment'
                     """
                 }
             }
@@ -24,8 +24,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                    scp -o StrictHostKeyChecking=no /tmp/deployment/index.html ansible@172.31.34.55:/home/ansible/deployment/
-                    scp -o StrictHostKeyChecking=no /tmp/deployment/playbook.yml ansible@172.31.34.55:/home/ansible/deployment/
+                    scp -o StrictHostKeyChecking=no /tmp/deployment/index.html ssh 172.31.34.55:/home/ansible/deployment/
+                    scp -o StrictHostKeyChecking=no /tmp/deployment/playbook.yml ssh 172.31.34.55:/home/ansible/deployment/
                     """
                 }
             }
@@ -34,7 +34,7 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    sh "ssh -o StrictHostKeyChecking=no ansible@172.31.34.55 'ansible-playbook /home/ansible/deployment/playbook.yml'"
+                    sh "ssh -o StrictHostKeyChecking=no ssh 172.31.34.55 'ansible-playbook /home/ansible/deployment/playbook.yml'"
                 }
             }
         }
