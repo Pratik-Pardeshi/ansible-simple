@@ -6,11 +6,12 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    rm -rf /tmp/deployment && mkdir -p /tmp/deployment
+                    mkdir -p /tmp/deployment
                     echo "<h1>Deployed via Jenkins</h1>" > /tmp/deployment/index.html
+
                     cat <<EOL > /tmp/deployment/playbook.yml
                     - name: Deploy Web Application
-                      hosts: webserver
+                      hosts: localhost
                       become: yes
                       tasks:
                         - name: Copy index.html to Web Server
@@ -19,7 +20,8 @@ pipeline {
                             dest: /var/www/html/index.html
                             mode: '0644'
                     EOL
-                    ls -l /tmp/deployment/
+
+                    ls -l /tmp/deployment/  # Debugging: Check if files exist
                     '''
                 }
             }
@@ -29,7 +31,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ansible@172.31.34.55 "
+                    ssh -o StrictHostKeyChecking=no ansible@172.31.34.144 "
                     sudo mkdir -p /home/ansible/deployment &&
                     sudo chown -R ansible:ansible /home/ansible/deployment &&
                     sudo chmod -R 777 /home/ansible/deployment &&
@@ -43,8 +45,8 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    scp -o StrictHostKeyChecking=no /tmp/deployment/index.html ansible@172.31.34.55:/home/ansible/deployment/
-                    scp -o StrictHostKeyChecking=no /tmp/deployment/playbook.yml ansible@172.31.34.55:/home/ansible/deployment/
+                    scp -o StrictHostKeyChecking=no /tmp/deployment/index.html ansible@172.31.34.144:/home/ansible/deployment/
+                    scp -o StrictHostKeyChecking=no /tmp/deployment/playbook.yml ansible@172.31.34.144:/home/ansible/deployment/
                     '''
                 }
             }
@@ -53,7 +55,10 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    sh "ssh -o StrictHostKeyChecking=no ansible@172.31.34.55 'ansible-playbook /home/ansible/deployment/playbook.yml'"
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ansible@172.31.34.144 "
+                    ansible-playbook /home/ansible/deployment/playbook.yml"
+                    '''
                 }
             }
         }
