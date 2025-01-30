@@ -10,14 +10,12 @@ pipeline {
             }
         }
 
-        stage('Set Permissions and Copy Files to Ansible Server') {
+        stage('Ensure Deployment Directory & Copy Files to Ansible Server') {
             steps {
                 script {
                     sh """
-                    chmod -R 777 /tmp/deployment
-                    ssh -o StrictHostKeyChecking=no ansible@172.31.34.144 'sudo mkdir -p /opt/deployment && sudo chmod -R 777 /opt/deployment'
-                    scp -o StrictHostKeyChecking=no -r /tmp/deployment/* ansible@172.31.34.144:/opt/deployment/
-                    ssh -o StrictHostKeyChecking=no ansible@172.31.34.144 'sudo chmod -R 777 /opt/deployment'
+                    ssh -o StrictHostKeyChecking=no ansible@172.31.34.55 'mkdir -p /home/ansible/deployment'
+                    scp -o StrictHostKeyChecking=no -r /tmp/deployment/index.html /tmp/deployment/playbook.yml ansible@172.31.34.55:/home/ansible/deployment/
                     """
                 }
             }
@@ -26,7 +24,7 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    sh "ssh -o StrictHostKeyChecking=no ansible@172.31.34.144 'sudo ansible-playbook /opt/deployment/playbook.yml'"
+                    sh "ssh -o StrictHostKeyChecking=no ansible@172.31.34.55 'ansible-playbook /home/ansible/deployment/playbook.yml'"
                 }
             }
         }
